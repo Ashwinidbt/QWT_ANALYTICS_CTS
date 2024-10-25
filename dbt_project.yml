@@ -37,20 +37,20 @@ clean-targets: # directories to be removed by `dbt clean`
 
 vars:
   v_city: "London"
-  dbt_dq_tool_schema: "{{env_var('dbt_auditschema','auditing')}}"
+  dbt_dq_tool_schema: "{{env_var('DBT_AUDITSCHEMA','AUDITING')}}"
 
 on-run-end:
   - '{{ dq_tools.store_test_results(results) }}'
 
 models:
   +pre-hook:
-    - "insert into {{env_var('dbt_auditschema','auditing')}}.models_audit(model_name  ,start_time ,end_time ,duration ) values ('{{this}}',current_timestamp,null,null);"
+    - "insert into {{env_var('DBT_AUDITSCHEMA','AUDITING')}}.models_audit(model_name  ,start_time ,end_time ,duration ) values ('{{this}}',current_timestamp,null,null);"
   +post-hook:
-    - "update {{env_var('dbt_auditschema','auditing')}}.models_audit set end_time=current_timestamp(),duration=datediff('second',start_time,current_timestamp()) where model_name='{{this}}' and end_time is null;"
+    - "update {{env_var('DBT_AUDITSCHEMA','AUDITING')}}.models_audit set end_time=current_timestamp(),duration=datediff('second',start_time,current_timestamp()) where model_name='{{this}}' and end_time is null;"
   QWT_ANALYTICS_CTS:
     # Applies to all files under models/example/
     example:
       +materialized: table
   dq_tools:
     # +database: DQ
-    +schema: "{{env_var('dbt_auditschema','auditing')}}"
+    +schema: "{{env_var('DBT_AUDITSCHEMA','AUDITING')}}"
