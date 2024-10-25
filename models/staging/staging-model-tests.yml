@@ -1,0 +1,42 @@
+version: 2
+ 
+models:
+  - name: stg_customers
+    description: "{{doc ('customers')}}"
+    columns:
+      - name: customerid
+        description: "primary key"
+        tests:
+          - unique
+          - not_null
+          - is_even
+ 
+  - name: stg_orders
+    description: "stores details of orders"
+    config:
+      schema: "{{env_var('DBT_STAGESCHEMA','STAGING')}}"
+    columns:
+      - name: orderid
+        description: "unique key to identify orders"
+        tests:
+          - unique
+          - not_null
+          - is_even
+ 
+  - name: stg_shipments
+    description: "contains shipments data"
+    columns:
+      - name: status
+        description: "shipment status changed by emp will be captured in this column"
+        tests:
+          - accepted_values:
+              values: ['replaced', 'shipped', 'ordered', 'returned']
+      - name: customerid
+        description: "FK from customer table to identify each customer per shipment"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_customers')
+              field: customerid
+
+ 
